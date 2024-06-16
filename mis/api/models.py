@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models import JSONField
 
+
 class Department(models.Model):
     name = models.CharField(max_length=100)
     abbr = models.CharField(max_length=10, unique=True)
@@ -84,7 +85,7 @@ class Period(models.Model):
     section = models.CharField(max_length=4, blank=True, null=True)
     alternate = models.BooleanField(default=False)
     start_period = models.IntegerField()
-    no_of_period = models.IntegerField(default=1)
+    end_period= models.IntegerField(default=1)
     period_type = models.IntegerField(choices=PeriodType.choices)
     room_number = models.CharField(max_length=15, blank=True, null=True)
     shift = models.ForeignKey(Shift, on_delete=models.DO_NOTHING, blank=True, null=True)  

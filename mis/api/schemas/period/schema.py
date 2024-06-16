@@ -1,4 +1,5 @@
 import graphene
+from django.db.models import Q
 from graphene_django import DjangoObjectType
 from api.models import Subject, Teacher, Period, Shift, Class
 
@@ -11,12 +12,12 @@ class CreatePeriod(graphene.Mutation):
     class Arguments:
         subject_id = graphene.Int(required=True)
         teacher_ids = graphene.List(graphene.Int, required=True)
-        classid_id = graphene.Int(required=True)
+        class_id = graphene.Int(required=True)
         note = graphene.String(required=False)
         section = graphene.String(required=False)
         alternate = graphene.Boolean(required=False)
         start_period = graphene.Int(required=True)
-        no_of_period = graphene.Int(required=True)
+        end_period = graphene.Int(required=True)
         period_type = graphene.Int(required=True)
         room_number = graphene.String(required=False)
         shift_id = graphene.Int(required=True)
@@ -24,67 +25,49 @@ class CreatePeriod(graphene.Mutation):
     period = graphene.Field(PeriodType)
 
     @classmethod
-    def mutate(cls, root, info, subject_id, teacher_ids, classid_id, start_period, no_of_period, period_type, shift_id, note=None, section=None, alternate=False, room_number=None):
+    def mutate(cls, root, info, subject_id, teacher_ids, class_id, start_period, end_period, period_type, shift_id, note=None, section=None, alternate=False, room_number=None):
+        # Retrieve related objects
         subject = Subject.objects.get(id=subject_id)
-        classid = Class.objects.get(id=classid_id)
+        class_obj = Class.objects.get(id=class_id)
         shift = Shift.objects.get(id=shift_id)
         teachers = Teacher.objects.filter(id__in=teacher_ids)
 
-        end_period = start_period + no_of_period - 1
-
-        # Check if the teacher is already occupied at the given time
+        # Check if any teacher is already occupied during the specified period
         for teacher in teachers:
-            occupied_periods = Period.objects.filter(
+            overlapping_periods = Period.objects.filter(
                 teachers=teacher,
                 shift=shift
             ).filter(
-                (Q(start_period__lte=start_period) & Q(start_period__gte=end_period)) |
-                (Q(start_period__lte=end_period) & Q(start_period__gte=start_period)) |
-                (Q(start_period__gte=start_period) & Q(start_period__lte=end_period))
+                Q(start_period__lt=end_period) & Q(end_period__gt=start_period)
             )
-            if occupied_periods.exists():
+            if overlapping_periods.exists():
                 raise Exception(f"Teacher {teacher.name} is already occupied during the given time span.")
 
-        # Check if the room_number is occupied at the given time
+        # Check if the room is already occupied during the specified period
         if room_number:
-            occupied_rooms = Period.objects.filter(
+            overlapping_rooms = Period.objects.filter(
                 room_number=room_number,
                 shift=shift
             ).filter(
-                (Q(start_period__lte=start_period) & Q(start_period__gte=end_period)) |
-                (Q(start_period__lte=end_period) & Q(start_period__gte=start_period)) |
-                (Q(start_period__gte=start_period) & Q(start_period__lte=end_period))
+                Q(start_period__lt=end_period) & Q(end_period__gt=start_period)
             )
-            if occupied_rooms.exists():
+            if overlapping_rooms.exists():
                 raise Exception(f"Room {room_number} is already occupied during the given time span.")
 
+        # Create the new period
         period = Period(
             subject=subject,
-            classid=classid,
+            classid=class_obj,
             note=note,
             section=section,
             alternate=alternate,
             start_period=start_period,
-            no_of_period=no_of_period,
+            end_period=end_period,
             period_type=period_type,
             room_number=room_number,
             shift=shift
         )
         period.save()
         period.teachers.set(teachers)
+        
         return CreatePeriod(period=period)
-
-# class Mutation(graphene.ObjectType):
-#     create_period = CreatePeriod.Field()
-
-# # class Query(graphene.ObjectType):
-#     period = graphene.Field(PeriodType, id=graphene.Int(required=True))
-#     all_periods = graphene.List(PeriodType)
-
-#     def resolve_period(self, info, id):
-#         return Period.objects.get(id=id)
-
-#     def resolve_all_periods(self, info):
-#         return Period.objects.all()
-
-#schema = graphene.Schema(query=Query, mutation=Mutation)
