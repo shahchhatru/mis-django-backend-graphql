@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.postgres.fields import JSONField
+from django.db.models import JSONField
 
 class Department(models.Model):
     name = models.CharField(max_length=100)
@@ -90,6 +90,9 @@ class Period(models.Model):
 
     def __str__(self):
         return f"{self.subject.name} - {self.classid.name}"
+    
+
+    
 
     
 
