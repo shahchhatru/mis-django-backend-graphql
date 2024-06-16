@@ -3,7 +3,7 @@ from django.db.models import JSONField
 
 class Department(models.Model):
     name = models.CharField(max_length=100)
-    abbr = models.CharField(max_length=10, blank=True, null=True)
+    abbr = models.CharField(max_length=10, unique=True)
 
     def __str__(self):
         return self.name
@@ -32,8 +32,8 @@ class Class(models.Model):
     
 class Shift(models.Model):
     name=models.CharField(max_length=20, unique=True)
-    start_time = models.CharField(max_length=10)
-    end_time = models.CharField(max_length=10)
+    start_time = models.TimeField()
+    end_time = models.TimeField()
 
     def __str__(self):
         return self.name
