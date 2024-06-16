@@ -1,4 +1,5 @@
 Pipfile
 Pipfile.lock
 
+mis/*/migrations
 mis/dev-db-data
