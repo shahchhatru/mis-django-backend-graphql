@@ -71,7 +71,7 @@ class CreateCategoryMutation(graphene.Mutation):
     def mutate(cls, root, info, name):
         category = Category(name=name)
         category.save()
-        return CategoryMutation(category=category)
+        return CreateCategoryMutation(category=category)
 
 class DeleteCategoryMutation(graphene.Mutation):
 

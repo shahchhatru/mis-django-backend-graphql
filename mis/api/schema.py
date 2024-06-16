@@ -1,56 +1,16 @@
 import graphene 
 from graphene_django import DjangoObjectType
 from .models import Class, Department, Year, Shift, Teacher, TimingField, Period, Subject
-
-# # class BookType(DjangoObjectType):
-# #     class Meta:
-# #         model = Book
-# #         fields = ("id","title","excerpt")
-
-
-# # class Query(graphene.ObjectType):
-# #     all_books = graphene.List(BookType)
-
-# #     def resolve_all_books(root, info):
-# #         return Book.objects.all()
-
-# # schema = graphene.Schema(query=Query)
+from .schemas.department.schema import DepartmentType,DepartmentMutation,UpdateDepartmentMutation
+from .schemas.year.schema import YearMutation,YearType,UpdateYearMutation
+from .schemas.collegeclass.schema import ClassType , ClassMutation,UpdateClassMutation
+from .schemas.shift.schema import ShiftType,ShiftMutation,UpdateShiftMutation
+from .schemas.timingField.schema import TimingFieldType,CreateTimingField,UpdateTimingField,DeleteTimingField
+from .schemas.teacher.schema import TeacherType,TeacherMutation,UpdateTeacherMutation,DeleteTeacherMutation
+from .schemas.subject.schema import SubjectType,SubjectMutation,UpdateSubjectMutation,DeleteSubjectMutation
+from .schemas.period.schema import PeriodType,CreatePeriod
 
 
-class DepartmentType(DjangoObjectType):
-    class Meta:
-        model = Department
-        fields = "__all__"
-
-class YearType(DjangoObjectType):
-    class Meta:
-        model = Year
-        fields = "__all__"
-
-class ClassType(DjangoObjectType):
-    class Meta:
-        model = Class
-        fields = "__all__" 
-
-class ShiftType(DjangoObjectType):
-    class Meta:
-        model = Shift
-        fields = "__all__"
-
-class TeacherType(DjangoObjectType):
-    class Meta:
-        model = Teacher
-        fields = "__all__"
-
-class TimingFieldType(DjangoObjectType):
-    class Meta:
-        model = TimingField
-        fields = "__all__"
-
-class SubjectType(DjangoObjectType):
-    class Meta:
-        model = Subject
-        fields = "__all__"
 
 class PeriodType(DjangoObjectType):
     class Meta:
@@ -85,5 +45,36 @@ class Query(graphene.ObjectType):
     def resolve_all_timings(root, info):
         return TimingField.objects.all()
     
+    def resolve_period(self, info, id):
+        return Period.objects.get(id=id)
 
-schema = graphene.Schema(query=Query)
+    def resolve_all_periods(self, info):
+        return Period.objects.all()
+
+
+
+class Mutation(graphene.ObjectType):
+    create_department = DepartmentMutation.Field()
+    update_department = UpdateDepartmentMutation.Field()
+    create_year = YearMutation.Field()
+    update_year = UpdateYearMutation.Field()
+    create_class= ClassMutation.Field()
+    update_class= UpdateClassMutation.Field()
+    create_shift = ShiftMutation.Field()
+    update_shift = UpdateShiftMutation.Field()
+    create_timing_field = CreateTimingField.Field()
+    update_timing_field = UpdateTimingField.Field()
+    delete_timing_field = DeleteTimingField.Field()
+    create_teacher= TeacherMutation.Field()
+    update_teacher = UpdateTeacherMutation.Field()
+    delete_teacher = DeleteTeacherMutation.Field()
+    create_subject = SubjectMutation.Field()
+    update_subject = UpdateSubjectMutation.Field()
+    delete_subject = DeleteSubjectMutation.Field()
+    create_period = CreatePeriod.Field()
+
+    
+    
+
+
+schema = graphene.Schema(query=Query,mutation=Mutation)

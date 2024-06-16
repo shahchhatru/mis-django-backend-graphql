@@ -84,9 +84,10 @@ class Period(models.Model):
     section = models.CharField(max_length=4, blank=True, null=True)
     alternate = models.BooleanField(default=False)
     start_period = models.IntegerField()
-    no_of_period = models.IntegerField()
+    no_of_period = models.IntegerField(default=1)
     period_type = models.IntegerField(choices=PeriodType.choices)
     room_number = models.CharField(max_length=15, blank=True, null=True)
+    shift = models.ForeignKey(Shift, on_delete=models.DO_NOTHING, blank=True, null=True)  
 
     def __str__(self):
         return f"{self.subject.name} - {self.classid.name}"

@@ -11,7 +11,7 @@ class SubjectMutation(graphene.Mutation):
 
     class Arguments:
         name = graphene.String(required=True)
-        code= graphene.String(requried=True)
+        code= graphene.String(required=True)
 
     subject = graphene.Field(SubjectType)
 
@@ -37,7 +37,7 @@ class UpdateSubjectMutation(graphene.Mutation):
             subject.name = name
         if code:
             subject.code=code
-            
+
         subject.save()
         return UpdateSubjectMutation(subject=subject)
     
