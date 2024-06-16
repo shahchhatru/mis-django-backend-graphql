@@ -17,15 +17,11 @@ class Year(models.Model):
         return str(self.number)
 
 class Class(models.Model):
-    class YearPart(models.IntegerChoices):
-        FIRST = 1, '1'
-        SECOND = 2, '2'
-
     name = models.CharField(max_length=100)
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
     section = models.CharField(max_length=4, blank=True, null=True)
     year = models.ForeignKey(Year, on_delete=models.CASCADE)
-    year_part = models.IntegerField(choices=YearPart.choices)
+    
     default_room_number = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
@@ -78,6 +74,18 @@ class Period(models.Model):
         LAB = 3, 'Lab'
         LTUTORIAL = 4, 'Lecture-Tutorial'
 
+    class YearPart(models.IntegerChoices):
+        FIRST = 1, '1'
+        SECOND = 2, '2'
+
+    class Day(models.IntegerChoices):
+        MONDAY = 2, 'Monday'
+        TUESDAY = 3, 'Tuesday'
+        WEDNESDAY = 4, 'Wednesday'
+        THURSDAY = 5, 'Thursday'
+        FRIDAY = 6, 'Friday'
+        SUNDAY = 1, 'Sunday'
+
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     teachers = models.ManyToManyField(Teacher)  # Changed to ManyToManyField
     classid = models.ForeignKey(Class, on_delete=models.CASCADE)
@@ -89,7 +97,8 @@ class Period(models.Model):
     period_type = models.IntegerField(choices=PeriodType.choices)
     room_number = models.CharField(max_length=15, blank=True, null=True)
     shift = models.ForeignKey(Shift, on_delete=models.DO_NOTHING, blank=True, null=True)  
-
+    year_part = models.IntegerField(choices=YearPart.choices,default=1)
+    day=models.IntegerField(choices=Day.choices,default=1)
     def __str__(self):
         return f"{self.subject.name} - {self.classid.name}"
     

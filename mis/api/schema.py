@@ -8,14 +8,9 @@ from .schemas.shift.schema import ShiftType,ShiftMutation,UpdateShiftMutation
 from .schemas.timingField.schema import TimingFieldType,CreateTimingField,UpdateTimingField,DeleteTimingField
 from .schemas.teacher.schema import TeacherType,TeacherMutation,UpdateTeacherMutation,DeleteTeacherMutation
 from .schemas.subject.schema import SubjectType,SubjectMutation,UpdateSubjectMutation,DeleteSubjectMutation
-from .schemas.period.schema import PeriodType,CreatePeriod
+from .schemas.period.schema import PeriodType,CreatePeriod,UpdatePeriod,DeletePeriod
 
 
-
-class PeriodType(DjangoObjectType):
-    class Meta:
-        model = Period
-        fields = "__all__"
 
 class Query(graphene.ObjectType):
     all_departments = graphene.List(DepartmentType)
@@ -26,6 +21,10 @@ class Query(graphene.ObjectType):
     all_timings = graphene.List(TimingFieldType)
     all_subjects = graphene.List(SubjectType)
     all_periods = graphene.List(PeriodType)
+    periods_by_teacher_id = graphene.List(PeriodType, teacher_id=graphene.Int(required=True))
+    periods_by_class_obj = graphene.List(PeriodType, class_id=graphene.Int(required=True))
+    periods_by_room_number = graphene.List(PeriodType, room_number=graphene.String(required=True))
+
 
     def resolve_all_departments(root, info):
         return Department.objects.all()
@@ -50,6 +49,22 @@ class Query(graphene.ObjectType):
 
     def resolve_all_periods(self, info):
         return Period.objects.all()
+    
+    def resolve_all_subjects(self,info):
+        return Subject.objects.all()
+    
+    def resolve_periods_by_teacher_id(self, info, teacher_id):
+        try:
+            teacher = Teacher.objects.get(id=teacher_id)
+            periods = Period.objects.filter(teachers=teacher)
+            return periods
+        except Teacher.DoesNotExist:
+            raise Exception(f"Teacher with id {teacher_id} does not exist.")
+        
+        
+    
+    
+    
 
 
 
@@ -72,6 +87,8 @@ class Mutation(graphene.ObjectType):
     update_subject = UpdateSubjectMutation.Field()
     delete_subject = DeleteSubjectMutation.Field()
     create_period = CreatePeriod.Field()
+    update_period = UpdatePeriod.Field()
+    delete_period = DeletePeriod.Field()    
 
     
     
