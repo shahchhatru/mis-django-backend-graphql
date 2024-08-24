@@ -1,5 +1,21 @@
+# Always ignore the migrations file, Pipfile, and Pipfile.lock
+migrations/
 Pipfile
 Pipfile.lock
 
+# Ignore specific directories and files in 'mis' folder
 mis/*/migrations
 mis/dev-db-data
+mis/*/__pycache__
+
+# Ignore Python cache files
+__pycache__/
+*.py[cod]
+
+# Ignore Django migrations except for __init__.py
+*/migrations/*
+!*/migrations/__init__.py
+
+# Ignore other cache files and logs
+*.cache
+*.log
