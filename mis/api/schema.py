@@ -53,6 +53,8 @@ class Query(graphene.ObjectType):
     def resolve_all_subjects(self,info):
         return Subject.objects.all()
     
+   
+    
     def resolve_periods_by_teacher_id(self, info, teacher_id):
         try:
             teacher = Teacher.objects.get(id=teacher_id)
