@@ -10,24 +10,14 @@ WORKDIR /app
 
 # Install system dependencies
 RUN apk update && apk upgrade && \
-    apk add --no-cache gcc g++ musl-dev curl libffi-dev postgresql-dev \
+    apk add --no-cache gcc g++ musl-dev libffi-dev postgresql-dev \
     zlib-dev jpeg-dev freetype-dev linux-headers
-
-# Install Poetry
-RUN curl -sSL https://install.python-poetry.org | python3 -
-
-# Add Poetry to PATH
-ENV PATH="/root/.local/bin:$PATH"
 
 # Copy requirements.txt to the container
 COPY requirements.txt /app/
 
-# Convert requirements.txt to poetry format and install dependencies
-RUN sed -e 's/==/>=/g' -e 's/$/,/g' requirements.txt > requirements_poetry.txt && \
-    poetry init --no-interaction && \
-    poetry add $(cat requirements_poetry.txt) && \
-    poetry config virtualenvs.create false && \
-    poetry install --no-interaction --no-ansi
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the project files
 COPY . /app/
