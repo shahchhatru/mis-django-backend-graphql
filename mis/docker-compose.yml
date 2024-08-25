@@ -12,12 +12,13 @@ services:
     volumes:
       - ./dev-db-data:/var/lib/postgresql/data
 
-  redis:
-    image: redis:latest
+  redis-stack:
+    image: redis/redis-stack:latest
     ports:
-      - 6379:6379
+      - 6379:6379       # Redis server
+      - 8004:8001       # RedisInsight GUI
     volumes:
-      - ./redis-data:/data
+      - redis-data:/data
 
 volumes:
   redis-data:
