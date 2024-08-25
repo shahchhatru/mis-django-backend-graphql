@@ -5,15 +5,13 @@ FROM python:3.12-alpine
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Install dependencies
-RUN apk update && apk add --no-cache \
-    gcc \
-    musl-dev \
-    libffi-dev \
-    postgresql-dev \
-    build-base \
-    linux-headers \
-    curl
+# Set work directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apk update && apk upgrade && \
+    apk add --no-cache gcc g++ musl-dev curl libffi-dev postgresql-dev \
+    zlib-dev jpeg-dev freetype-dev linux-headers
 
 # Install Poetry
 RUN curl -sSL https://install.python-poetry.org | python3 -
@@ -21,22 +19,20 @@ RUN curl -sSL https://install.python-poetry.org | python3 -
 # Add Poetry to PATH
 ENV PATH="/root/.local/bin:$PATH"
 
-# Set the working directory in the container
-WORKDIR /app
-
 # Copy requirements.txt to the container
 COPY requirements.txt /app/
 
-# Generate pyproject.toml from requirements.txt and install dependencies
-RUN poetry init --no-interaction \
-    && poetry add $(cat requirements.txt) \
-    && poetry config virtualenvs.create false \
-    && poetry install --no-interaction --no-ansi
+# Convert requirements.txt to poetry format and install dependencies
+RUN sed -e 's/==/>=/g' -e 's/$/,/g' requirements.txt > requirements_poetry.txt && \
+    poetry init --no-interaction && \
+    poetry add $(cat requirements_poetry.txt) && \
+    poetry config virtualenvs.create false && \
+    poetry install --no-interaction --no-ansi
 
 # Copy the rest of the project files
 COPY . /app/
 
-# Collect static files
+# Collect static files (if needed)
 RUN python mis/manage.py collectstatic --noinput
 
 # Expose the port that the server will run on
