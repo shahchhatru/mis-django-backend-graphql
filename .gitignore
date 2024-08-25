@@ -6,6 +6,7 @@ Pipfile.lock
 # Ignore specific directories and files in 'mis' folder
 mis/*/migrations
 mis/dev-db-data
+mis/redis-data
 mis/*/__pycache__
 
 # Ignore Python cache files
