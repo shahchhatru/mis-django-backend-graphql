@@ -18,18 +18,18 @@ RUN apk update && apk add --no-cache \
 # Install Poetry
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
+# Add Poetry to PATH
+ENV PATH="/root/.local/bin:$PATH"
+
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the requirements.txt to the container
-COPY requirements.txt /app/
+# Copy the project files
+COPY . /app/
 
 # Install the Python dependencies
 RUN poetry config virtualenvs.create false \
     && poetry install --no-interaction --no-ansi
-
-# Copy the project files
-COPY . /app/
 
 # Collect static files
 RUN python mis/manage.py collectstatic --noinput
