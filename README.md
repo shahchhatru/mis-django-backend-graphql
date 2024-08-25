@@ -5,6 +5,22 @@ start the database
 docker-compose up -d
 ```
 
+Activate your virtual environment and install requirements.txt file dependenices. Use poetry or pipenv or any other virtual environment manager.
+
+
+Navigate to mis folder . The folder where there is manage.py file.
+
+```
+python manage.py runserver 
+```
+
+OR 
+
+```
+python manage.py runserver custom_port_number
+
+```
+
 To upload the data.dump file from your host system to the PostgreSQL container and then restore the database, follow these steps:
 
 Copy the Dump File from Host to Container:
