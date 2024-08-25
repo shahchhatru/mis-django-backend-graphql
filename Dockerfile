@@ -24,12 +24,17 @@ ENV PATH="/root/.local/bin:$PATH"
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the project files
-COPY . /app/
+# Copy requirements.txt to the container
+COPY requirements.txt /app/
 
-# Install the Python dependencies
-RUN poetry config virtualenvs.create false \
+# Generate pyproject.toml from requirements.txt and install dependencies
+RUN poetry init --no-interaction \
+    && poetry add $(cat requirements.txt) \
+    && poetry config virtualenvs.create false \
     && poetry install --no-interaction --no-ansi
+
+# Copy the rest of the project files
+COPY . /app/
 
 # Collect static files
 RUN python mis/manage.py collectstatic --noinput
