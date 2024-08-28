@@ -30,7 +30,6 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -39,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'graphene_django',
-    
+    'graphql_jwt',
+    'graphql_jwt.refresh_token.apps.RefreshTokenConfig',
     'api',
     'quiz',
 ]
@@ -47,11 +47,13 @@ INSTALLED_APPS = [
 AUTH_USER_MODEL = 'api.User'
 
 GRAPHENE = {
-    'SCHEMA': 'path.to.your.schema.user_schema',
+    'SCHEMA': 'api.schema.user_schema',  # Adjust this path to your actual schema location
     'MIDDLEWARE': [
         'graphql_jwt.middleware.JSONWebTokenMiddleware',
     ],
 }
+
+#might cause some issue try to comment it out.
 AUTHENTICATION_BACKENDS = [
     'graphql_jwt.backends.JSONWebTokenBackend',
     'django.contrib.auth.backends.ModelBackend',
@@ -64,6 +66,7 @@ GRAPHQL_JWT = {
     'JWT_VERIFY_EXPIRATION': True,
     'JWT_EXPIRATION_DELTA': timedelta(days=7),
     'JWT_REFRESH_EXPIRATION_DELTA': timedelta(days=30),
+    'JWT_LONG_RUNNING_REFRESH_TOKEN': True,
 }
 
 MIDDLEWARE = [
@@ -74,6 +77,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+   
 ]
 
 ROOT_URLCONF = 'mis.urls'

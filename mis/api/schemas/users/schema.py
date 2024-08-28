@@ -24,9 +24,10 @@ class Register(graphene.Mutation):
         password = graphene.String(required=True)
 
     def mutate(self, info, email, password):
-        user = User(email=email,password=password, role=User.Role.TEACHER)
-        # user.set_password(password)
+        user = User(email=email, role=User.Role.TEACHER)
+        user.set_password(password)  # This hashes the password
         user.save()
+
 
         token = get_token(user)
         return Register(user=user, token=token)
@@ -41,15 +42,19 @@ class Login(graphene.Mutation):
         password = graphene.String(required=True)
 
     def mutate(self, info, email, password):
-        user = User.objects.get(email=email)
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise Exception('User does not exist')
 
         if not user.check_password(password):
+            print(f"Provided password: {password}")
+            print(f"Stored password hash: {user.password}")
             raise Exception('Invalid password')
 
         token = get_token(user)
         refresh_token = create_refresh_token(user)
         return Login(user=user, token=token, refresh_token=refresh_token)
-    
  
 
 class PasswordReset(graphene.Mutation):
@@ -147,6 +152,8 @@ class Query(graphene.ObjectType):
 class Mutation(graphene.ObjectType):
     register = Register.Field()
     login = Login.Field()
+    verify_token = graphql_jwt.Verify.Field()
+    refresh_token = graphql_jwt.Refresh.Field()
     password_reset = PasswordReset.Field()
     password_reset_confirm = PasswordResetConfirm.Field()
     update_user = UpdateUser.Field()
