@@ -134,31 +134,32 @@ class DeleteUser(graphene.Mutation):
         user.delete()
         return DeleteUser(success=True)
 
-class Query(graphene.ObjectType):
-    me = graphene.Field(UserType)
-    user = graphene.Field(UserType, id=graphene.Int(required=True))
-    all_users = graphene.List(UserType)
+# class Query(graphene.ObjectType):
+#     me = graphene.Field(UserType)
+#     user = graphene.Field(UserType, id=graphene.Int(required=True))
+#     all_users = graphene.List(UserType)
 
-    @login_required
-    def resolve_me(self, info):
-        return info.context.user
+#     @login_required
+#     def resolve_me(self, info):
+        
+#         return info.context.user
 
-    def resolve_user(self, info, id):
-        return User.objects.get(pk=id)
+#     def resolve_user(self, info, id):
+#         return User.objects.get(pk=id)
 
-    def resolve_all_users(self, info):
-        return User.objects.all()
+#     def resolve_all_users(self, info):
+#         return User.objects.all()
 
-class Mutation(graphene.ObjectType):
-    register = Register.Field()
-    login = Login.Field()
-    verify_token = graphql_jwt.Verify.Field()
-    refresh_token = graphql_jwt.Refresh.Field()
-    password_reset = PasswordReset.Field()
-    password_reset_confirm = PasswordResetConfirm.Field()
-    update_user = UpdateUser.Field()
-    delete_user = DeleteUser.Field()
-    verify_token = graphql_jwt.Verify.Field()
-    refresh_token = graphql_jwt.Refresh.Field()
+# class Mutation(graphene.ObjectType):
+#     register = Register.Field()
+#     login = Login.Field()
+#     verify_token = graphql_jwt.Verify.Field()
+#     refresh_token = graphql_jwt.Refresh.Field()
+#     password_reset = PasswordReset.Field()
+#     password_reset_confirm = PasswordResetConfirm.Field()
+#     update_user = UpdateUser.Field()
+#     delete_user = DeleteUser.Field()
+#     verify_token = graphql_jwt.Verify.Field()
+#     refresh_token = graphql_jwt.Refresh.Field()
 
-user_schema = graphene.Schema(query=Query, mutation=Mutation)
+# user_schema = graphene.Schema(query=Query, mutation=Mutation)

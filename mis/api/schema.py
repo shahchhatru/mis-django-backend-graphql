@@ -1,4 +1,6 @@
 import graphene 
+from graphql_jwt.decorators import login_required
+import graphql_jwt
 from graphene_django import DjangoObjectType
 from .models import Class, Department, Year, Shift, Teacher, TimingField, Period, Subject
 from .schemas.department.schema import DepartmentType,DepartmentMutation,UpdateDepartmentMutation
@@ -9,8 +11,8 @@ from .schemas.timingField.schema import TimingFieldType,CreateTimingField,Update
 from .schemas.teacher.schema import TeacherType,TeacherMutation,UpdateTeacherMutation,DeleteTeacherMutation
 from .schemas.subject.schema import SubjectType,SubjectMutation,UpdateSubjectMutation,DeleteSubjectMutation
 from .schemas.period.schema import PeriodType,CreatePeriod,UpdatePeriod,DeletePeriod
-
-
+from .schemas.users.schema import UserType,Register,Login, PasswordReset, PasswordResetConfirm,UpdateUser,DeleteUser
+from api.models import User
 
 class Query(graphene.ObjectType):
     all_departments = graphene.List(DepartmentType)
@@ -24,6 +26,22 @@ class Query(graphene.ObjectType):
     periods_by_teacher_id = graphene.List(PeriodType, teacher_id=graphene.Int(required=True))
     periods_by_class_obj = graphene.List(PeriodType, class_id=graphene.Int(required=True))
     periods_by_room_number = graphene.List(PeriodType, room_number=graphene.String(required=True))
+    me = graphene.Field(UserType)
+    user = graphene.Field(UserType, id=graphene.Int(required=True))
+    all_users = graphene.List(UserType)
+
+    @login_required
+    def resolve_me(self, info):
+        
+        
+        return info.context.user
+
+    def resolve_user(self, info, id):
+        return User.objects.get(pk=id)
+
+    def resolve_all_users(self, info):
+        return User.objects.all()
+
 
 
     def resolve_all_departments(root, info):
@@ -90,7 +108,17 @@ class Mutation(graphene.ObjectType):
     delete_subject = DeleteSubjectMutation.Field()
     create_period = CreatePeriod.Field()
     update_period = UpdatePeriod.Field()
-    delete_period = DeletePeriod.Field()    
+    delete_period = DeletePeriod.Field()  
+    register = Register.Field()
+    login = Login.Field()
+    verify_token = graphql_jwt.Verify.Field()
+    refresh_token = graphql_jwt.Refresh.Field()
+    password_reset = PasswordReset.Field()
+    password_reset_confirm = PasswordResetConfirm.Field()
+    update_user = UpdateUser.Field()
+    delete_user = DeleteUser.Field()
+    verify_token = graphql_jwt.Verify.Field()
+    refresh_token = graphql_jwt.Refresh.Field()  
 
     
     
