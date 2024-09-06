@@ -1,7 +1,7 @@
 from django.urls import path
 from graphene_django.views import GraphQLView
 from api.schema import schema
-#from api.schemas.users.schema import user_schema
+#   from api.schemas.users.schema import user_schema
 from django.views.decorators.csrf import csrf_exempt
 urlpatterns=[
     #only a single url to access GraphQL
