@@ -1,6 +1,7 @@
 import graphene
 from graphql_jwt.shortcuts import get_token, create_refresh_token
 import graphql_jwt
+from graphql_jwt.utils import jwt_encode, jwt_payload
 from graphql_jwt.decorators import login_required
 from django.core.mail import send_mail
 from django.conf import settings
@@ -14,6 +15,12 @@ class UserType(DjangoObjectType):
     class Meta:
         model = User
         fields = ("id", "email", "role")
+
+
+def generate_token_with_role(user):
+    payload = jwt_payload(user)
+    payload['role'] = user.role  # Add the user's role to the payload
+    return jwt_encode(payload)
 
 class Register(graphene.Mutation):
     user = graphene.Field(UserType)
@@ -52,7 +59,7 @@ class Login(graphene.Mutation):
             print(f"Stored password hash: {user.password}")
             raise Exception('Invalid password')
 
-        token = get_token(user)
+        token = generate_token_with_role(user)
         refresh_token = create_refresh_token(user)
         return Login(user=user, token=token, refresh_token=refresh_token)
  
