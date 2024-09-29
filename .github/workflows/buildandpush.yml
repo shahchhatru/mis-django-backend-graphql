@@ -1,4 +1,4 @@
-name: Build and Push Docker Image
+name: Build, Push, Pull, and Run Docker Image
 
 on:
   push:
@@ -35,3 +35,29 @@ jobs:
       - name: Post job cleanup
         if: always()
         run: docker logout
+
+  # Job to pull and run the Docker image on the self-hosted server
+  pull-and-run:
+    runs-on: self-hosted
+    name: Pull and Run Docker Image on Self-Hosted Server
+    steps:
+      - name: Log in to Docker Hub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Pull Docker Image
+        run: docker pull shahchhatru/routine-ms-django-graphql-server:latest
+
+      - name: Stop and Remove Previous Container (if running)
+        run: |
+          docker stop routine-ms-container || true
+          docker rm routine-ms-container || true
+
+      - name: Run Docker Container with Host Networking
+        run: |
+          docker run -d \
+          --network host \
+          --name routine-ms-container \
+          shahchhatru/routine-ms-django-graphql-server:latest
+
+      - name: Verify Container is Running
+        run: docker ps | grep routine-ms-container
