@@ -1,2 +1,6 @@
 Pipfile
 Pipfile.lock
+
+.github/
+
+mis/dev-db-data/

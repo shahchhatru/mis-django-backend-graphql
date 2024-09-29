@@ -1,34 +1,36 @@
 # Use an official Python runtime as a parent image
-FROM python:3.12-slim
+FROM python:3.12-slim AS builder
 
 # Set environment variables
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+ENV PYTHONUNBUFFERED=1 \
+    POETRY_NO_INTERACTION=1 \
+    POETRY_VIRTUALENVS_IN_PROJECT=true \
+    POETRY_VIRTUALENVS_CREATE=false \
+    POETRY_CACHE_DIR=/tmp/poetry_cache
 
-# Set work directory
+# Set the working directory
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
+# Install Poetry
+RUN pip install poetry
 
-# Copy requirements.txt to the container
-COPY requirements.txt /app/
+# Copy only the dependency files for caching
+COPY pyproject.toml poetry.lock ./
 
-# Fix the requirements.txt file and install Python dependencies
-RUN sed -i 's/>=2.8.6aniso8601==9.0.1/>=2.8.6\naniso8601==9.0.1/' requirements.txt \
-    && pip install --no-cache-dir -r requirements.txt
+# Install dependencies
+RUN poetry install --no-root && rm -rf $POETRY_CACHE_DIR
 
-# Copy the rest of the project files
-COPY . /app/
+# Copy the rest of the application code
+COPY . .
 
-# Collect static files (if needed)
-RUN python mis/manage.py collectstatic --noinput
+WORKDIR /app/mis
+# Collect static files AFTER all dependencies and app files are present
+RUN python manage.py collectstatic --noinput
 
-# Expose the port that the server will run on
+# Expose the port the app runs on
 EXPOSE 8001
 
-# Start the Gunicorn server
-CMD ["gunicorn", "--bind", "0.0.0.0:8001", "mis.wsgi:application"]
+
+
+# Command to run the application using Gunicorn
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8001", "mis.wsgi:application"]
