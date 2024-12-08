@@ -14,6 +14,42 @@ admin.site.register(TimingField)
 admin.site.register(Period)
 admin.site.register(Subject)
 
+class DepartmentAdmin(admin.ModelAdmin):
+    fields ="__all__"
+    list_display="__all__"
+
+class YearAdmin(admin.ModelAdmin):
+    fields ="__all__"
+    list_display ="__all__"
+
+class ClassAdmin(admin.ModelAdmin):
+    fields ="__all__"
+    list_display ="__all__"
+
+class ShiftAdmin(admin.ModelAdmin):
+    fields ="__all__"
+    list_display ="__all__"
+
+class TeacherAdmin(admin.ModelAdmin):
+    fields ="__all__"
+    list_display ="__all__"
+
+class TimingFieldAdmin(admin.ModelAdmin):
+    fields ="__all__"
+    list_display ="__all__"
+
+class PeriodAdmin(admin.ModelAdmin):
+    fields ="__all__"
+    list_display ="__all__"
+
+class SubjectAdmin(admin.ModelAdmin):
+    fields ="__all__"
+    list_display ="__all__"
+
+
+
+
+
 from django.contrib.auth.admin import UserAdmin
 from .models import User
 

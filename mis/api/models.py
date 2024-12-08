@@ -22,7 +22,7 @@ class Class(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
     section = models.CharField(max_length=4, blank=True, null=True)
     year = models.ForeignKey(Year, on_delete=models.CASCADE)
-    
+    group= models.CharField(max_length=10,blank=True,null=True)
     default_room_number = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
@@ -142,7 +142,7 @@ class Period(models.Model):
     teachers = models.ManyToManyField(Teacher)  # Changed to ManyToManyField
     classid = models.ForeignKey(Class, on_delete=models.CASCADE)
     note = models.CharField(max_length=100, blank=True, null=True)
-    section = models.CharField(max_length=4, blank=True, null=True)
+    group = models.CharField(max_length=4, blank=True, null=True)
     alternate = models.BooleanField(default=False)
     start_period = models.IntegerField()
     end_period= models.IntegerField(default=1)
